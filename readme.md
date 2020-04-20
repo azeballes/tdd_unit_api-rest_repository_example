@@ -17,12 +17,13 @@ La configuración de acceso a la api rest vamos a suponer que la tendremos dispo
 }
 ```
 
+### Arquitectura de aplicación
+
 Utilizando DDD vamos a crear la siguiente arquitectura de aplicación:
 
 MyApp.Infraestructure.Data.Repository
 MyApp.Infraestructure.Data.Repository.Test
 MyApp.Domain.Entities
-
 
 **1- Creamos la configuración inicial de la app**
 
@@ -68,6 +69,8 @@ namespace MyApp.Infraestructure.Data.Repository.Test
     }
 }
 ```
+
+### Pruebas de inicialización
 
 **5- Primer test**
 
@@ -240,11 +243,13 @@ Hacemos pasar el test
     }
 ```
 
-**7- Cuarto test**
+## Listar personas
+
+**8- Cuarto test**
 
 Para poder acceder a un recurso en una api rest necesitamos la dirección base del recurso. De acuerdo a lo anterior en este nuevo test vamos a configurar una dirección base incorrecta y deberíamos obtener una falla al intentar acceder al recurso.
 
-Inicialmente vamos a agregar la colaboración de un HttpClien al repositorio
+Inicialmente vamos a agregar la colaboración de un HttpClient al repositorio
 
 > MyApp.Infraestructure.Data.Repository.PersonaRepository.cs:
 ```csharp
@@ -253,7 +258,7 @@ Inicialmente vamos a agregar la colaboración de un HttpClien al repositorio
     }
 ```
 
-Refactorizamos los tests agregando null a la instancia del repo
+*Refactorizamos los tests agregando null a la instancia del repo*
 
 En este cuarto test vamos a efectuar la prueba más simple de falla del servicio externo debido a una configuración no válida del recurso base.
 El test verifica que se genere una excepción con un mensaje amigable y que la misma tenga una excepción anidada para 
@@ -284,3 +289,5 @@ El test verifica que se genere una excepción con un mensaje amigable y que la m
         Assert.NotNull(exception.InnerException.Message);
     }
 ```
+
+## Continuará ...
