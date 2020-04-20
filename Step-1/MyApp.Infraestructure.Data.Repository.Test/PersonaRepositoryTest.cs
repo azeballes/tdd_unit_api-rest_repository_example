@@ -48,10 +48,9 @@ namespace MyApp.Infraestructure.Data.Repository.Test {
             var httpClient = new HttpClient(mockMessageHandler.Object);
             var sut = new PersonaRepository(configuration, httpClient);
             
-            var exception = Assert.Throws<Exception>( () => sut.All() );
-            
+            var exception = Assert.Throws<Exception>( () => sut.All() );            
             Assert.Equal(PersonaRepository.AccessErrorServiceMessage, exception.Message);
-            Assert.NotNull(exception.InnerException.Message);
+            Assert.IsType<InvalidOperationException>(exception.InnerException);
         }
         
     }

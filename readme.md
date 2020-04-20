@@ -261,7 +261,7 @@ Inicialmente vamos a agregar la colaboración de un HttpClient al repositorio
 *Refactorizamos los tests agregando null a la instancia del repo*
 
 En este cuarto test vamos a efectuar la prueba más simple de falla del servicio externo debido a una configuración no válida del recurso base.
-El test verifica que se genere una excepción con un mensaje amigable y que la misma tenga una excepción anidada para 
+El test verifica que se genere una excepción con un mensaje amigable y que la misma tenga una excepción anidada del tipo InvalidOperationException (que se produce cuando se indica una uri incorrecta) 
 
 
 > MyApp.Infraestructure.Data.Repository.Test.PersonaRepositoryTest.cs:
@@ -286,7 +286,7 @@ El test verifica que se genere una excepción con un mensaje amigable y que la m
         var exception = Assert.Throws<Exception>( () => sut.All() );
         
         Assert.Equal(PersonaRepository.AccessErrorServiceMessage, exception.Message);
-        Assert.NotNull(exception.InnerException.Message);
+        Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 ```
 
