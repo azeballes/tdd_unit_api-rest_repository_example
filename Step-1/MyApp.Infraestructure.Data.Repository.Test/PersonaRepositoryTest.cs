@@ -7,43 +7,60 @@ using System.Net.Http;
 namespace MyApp.Infraestructure.Data.Repository.Test {
 
     public class PersonaRepositoryTest {
+        
+        private readonly string _configurationKey = $"{PersonaRepository.ConfigurationSectionName}:{PersonaRepository.EndPointKey}";
+        
         [Fact]
-        public void RepositorioPersonasNecesitaAccederALaConfiguración () {
+        public void DeberiaDefinirUnMensajeDeConfiguracionNoValida()
+        {
+            Assert.Equal("No se informó la configuración", PersonaRepository.NoValidConfigurationMessage);
+        }
+
+        [Fact]
+        public void DeberiaFallarSiNoSeInformaLaConfiguracion() {
             IConfiguration configuration = null;
             var exception = Assert.Throws<Exception> (() => new PersonaRepository (configuration, null));
             Assert.Equal (PersonaRepository.NoValidConfigurationMessage, exception.Message);
         }
 
         [Fact]
-        public void RepositorioPersonasNecesitaAccederALaSecciónDeConfiguración(){
-            IConfiguration configuration = new Mock<IConfiguration>().Object;
-            var exception = Assert.Throws<Exception>( () => new PersonaRepository(configuration, null) );
-            Assert.Equal(PersonaRepository.NoConfigurationSectionMessage, exception.Message);
+        public void DeberiaDefinirElNombreDeLaSeccionDeConfiguracion()
+        {
+            Assert.Equal("repository_apis", PersonaRepository.ConfigurationSectionName);            
         }
 
         [Fact]
-        public void RepositorioPersonasNecesitaAccederALaDirecciónBaseDelRecurso(){
+        public void DeberiaDefinirElNombreDeLaPropiedadDireccionBaseDelRecurso()
+        {
+            Assert.Equal("url_base_personas", PersonaRepository.EndPointKey);
+        }
+
+        [Fact]
+        public void DeberiaFallarSiNoSeConfiguranLasPropiedadesNecesarias(){
             var configurationMock = new Mock<IConfiguration>();
-            var configurationSectionMock = new Mock<IConfigurationSection>();
-            configurationMock.Setup(cfg => cfg.GetSection(PersonaRepository.ConfigurationSectionName))
-                    .Returns(configurationSectionMock.Object);
+            configurationMock.Setup(cfg => cfg[_configurationKey])
+                    .Returns<IConfiguration>(null);
             var exception = Assert.Throws<Exception>( () => new PersonaRepository(configurationMock.Object, null) );
             Assert.Equal(PersonaRepository.NoEndPointMessage, exception.Message);
         }
 
         private IConfiguration MockConfigurationObject( string base_url ){
             var configurationMock = new Mock<IConfiguration>();
-            var configurationSectionMock = new Mock<IConfigurationSection>();
-            configurationSectionMock.Setup( section => section[PersonaRepository.EndPointKey] ).Returns(base_url);
-            configurationMock.Setup(cfg => cfg.GetSection(PersonaRepository.ConfigurationSectionName))
-                    .Returns(configurationSectionMock.Object);
+            configurationMock.Setup(cfg => cfg[_configurationKey])
+                    .Returns(base_url);
             return configurationMock.Object;
         }
 
         [Fact]
-        public void ObtenerTodasLasPersonasDeberíaFallarSiNoTieneUnaDirecciónBaseVálida(){
-            const string noValidEnpoint = "";
-            var configuration = MockConfigurationObject(noValidEnpoint);
+        public void DeberiaDefinirUnErrorGenericoDeAccesoAlServicio()
+        {
+            Assert.Equal("Servicio personas no disponible", PersonaRepository.AccessErrorServiceMessage);
+        }
+
+        [Fact]
+        public void DeberiaMostrarElMensajeDeErrorGenericoSiNoPuedeAccederAlServicio(){
+            const string noValidUri = "";
+            var configuration = MockConfigurationObject(noValidUri);
             var mockMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpClient = new HttpClient(mockMessageHandler.Object);
             var sut = new PersonaRepository(configuration, httpClient);
